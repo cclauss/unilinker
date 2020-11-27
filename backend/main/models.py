@@ -6,7 +6,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"Profile({self.user.username})"
+        return f"Profile({self.user})"
 
 
 class Link(models.Model):
