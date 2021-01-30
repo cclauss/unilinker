@@ -20,7 +20,7 @@ jobs:
           key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
       - name: Install dependencies
         if: steps.cache-pipenv.outputs.cache-hit != 'true'
-        run: pipenv install --deploy --dev
+        run: pipenv install --python ${{ pythonLocation }} --deploy --dev
       - run: mypy --ignore-missing-imports . || true
       - run: pytest . || true
       - run: pytest --doctest-modules . || true
