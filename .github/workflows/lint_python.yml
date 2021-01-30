@@ -13,7 +13,7 @@ jobs:
       - run: bandit -r . || true
       - run: black --check . || true
       - run: codespell --quiet-level=2  # --ignore-words-list="" --skip=""
-      - run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+      - run: flake8 . --count --show-source --statistics
       - run: isort --check-only --profile black . || true
       - id: cache-pipenv
         uses: actions/cache@v1
@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache-pipenv.outputs.cache-hit != 'true'
         run: pipenv install --deploy --dev
-      - run: pip install django
+      - run: pip install django djangorestframework
       - run: mypy --ignore-missing-imports . || true
       - run: pytest . || true
       - run: pytest --doctest-modules . || true
