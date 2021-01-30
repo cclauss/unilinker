@@ -6,13 +6,21 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
+      - run: pip install --upgrade pip pipenv wheel
       - run: pip install bandit black codespell flake8 isort mypy pytest pyupgrade
       - run: bandit -r . || true
       - run: black --check . || true
       - run: codespell --quiet-level=2  # --ignore-words-list="" --skip=""
       - run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
       - run: isort --check-only --profile black . || true
-      - run: pip install django -r requirements.txt || true
+      - id: cache-pipenv
+        uses: actions/cache@v1
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+      - name: Install dependencies
+        if: steps.cache-pipenv.outputs.cache-hit != 'true'
+        run: pipenv install --deploy --dev
       - run: mypy --ignore-missing-imports . || true
       - run: pytest . || true
       - run: pytest --doctest-modules . || true
