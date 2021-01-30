@@ -13,7 +13,7 @@ jobs:
       - run: bandit -r . || true
       - run: black --check . || true
       - run: codespell --quiet-level=2  # --ignore-words-list="" --skip=""
-      - run: flake8 . --count --show-source --statistics
+      - run: flake8 . --count --ignore=F401 --mal-line-length=121 --show-source --statistics
       - run: isort --check-only --profile black . || true
       - id: cache-pipenv
         uses: actions/cache@v1
