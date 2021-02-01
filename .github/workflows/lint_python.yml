@@ -1,0 +1,30 @@
+name: lint_python
+on: [pull_request, push]
+jobs:
+  lint_python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - run: pip install --upgrade pip pipenv wheel
+      - run: pip install bandit black codespell flake8 isort mypy pytest pyupgrade
+      - run: bandit -r . || true
+      - run: black --check . || true
+      - run: codespell --quiet-level=2  # --ignore-words-list="" --skip=""
+      - run: flake8 . --count --ignore=F401 --max-line-length=121 --show-source --statistics
+      - run: isort --check-only --profile black . || true
+      - id: cache-pipenv
+        uses: actions/cache@v1
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+      - name: Install dependencies
+        if: steps.cache-pipenv.outputs.cache-hit != 'true'
+        run: pipenv install --deploy --dev
+      - run: pip install django djangorestframework
+      - run: mypy --ignore-missing-imports . || true
+      - run: pytest . || true
+      - run: pytest --doctest-modules . || true
+      - run: shopt -s globstar && pyupgrade --py38-plus **/*.py
